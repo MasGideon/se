@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inline Validation</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        input { display: block; margin-bottom: 10px; padding: 8px; width: 250px; }
+        #errorOld { color: red; display: none; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Form 1</h2>
+    <form onsubmit="return validateForm(event)">
+        <input type="text" id="nameOld" placeholder="Name" required>
+        <input type="email" id="emailOld" placeholder="Email" required>
+        <input type="password" id="passOld" placeholder="Password">
+        <div id="errorOld">Password is needed!</div>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        function validateForm(event) {
+            const passValue = document.getElementById('passOld').value;
+            const errorDiv = document.getElementById('errorOld');
+
+            if (passValue.trim() === "") {
+                // Prevents refresh
+                event.preventDefault(); 
+                errorDiv.style.display = "block";
+                
+                // Returns false to tell the browser "do not send this form"
+                return false; 
+            }
+            alert("Form submitted!");
+            return true;
+        }
+    </script>
+
+</body>
+</html>
