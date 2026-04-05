@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Projects - Conditionals Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+        }
+
+        .sidebar h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar h2::before {
+            content: '⚡';
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+            text-align: left;
+            width: 100%;
+        }
+
+        .header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            color: var(--text-main);
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f1f5f9;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+
+        .result-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                padding: 0;
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <h2>Conditionals</h2>
+    <ul class="nav-list" id="nav-list">
+        <!-- JS will populate this -->
+    </ul>
+</aside>
+
+<main class="main-content">
+    <div class="container animate-fade" id="app-container">
+        <div class="header">
+            <h1 id="task-title">Select a Task</h1>
+            <p id="task-desc">Choose an exercise from the sidebar to begin.</p>
+        </div>
+
+        <div class="card" id="task-card">
+            <div id="input-container">
+                <!-- Inputs will be dynamic -->
+            </div>
+            <button class="btn" onclick="executeCurrentTask()" id="run-btn">Run Task</button>
+
+            <div class="result">
+                <p class="result-text" id="result-display">Result will appear here...</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const tasks = [
+        { id: 1, title: "Even or Odd", desc: "Check if a number is even or odd.", inputs: [{ label: "Enter Number", type: "number", id: "num1" }] },
+        { id: 2, title: "Largest of 3", desc: "Find the maximum of three numbers.", inputs: [{ label: "Num 1", type: "number", id: "num1" }, { label: "Num 2", type: "number", id: "num2" }, { label: "Num 3", type: "number", id: "num3" }] },
+        { id: 3, title: "Grade Calculator", desc: "Calculate grade based on marks (0-100).", inputs: [{ label: "Marks", type: "number", id: "num1" }] },
+        { id: 4, title: "Simple Calculator", desc: "Basic arithmetic using Operators.", inputs: [{ label: "Value A", type: "number", id: "num1" }, { label: "Value B", type: "number", id: "num2" }, { label: "Operator (+, -, *, /)", type: "text", id: "op" }] },
+        { id: 5, title: "Leap Year", desc: "Check if a year is a leap year.", inputs: [{ label: "Year", type: "number", id: "num1" }] },
+        { id: 6, title: "Vowel/Consonant", desc: "Check if a character is a vowel or consonant.", inputs: [{ label: "Character", type: "text", id: "char1", maxlength: 1 }] },
+        { id: 7, title: "Age Eligibility", desc: "Check if eligible for voting (18+) or driving (16+).", inputs: [{ label: "Age", type: "number", id: "num1" }] },
+        { id: 8, title: "Password Strength", desc: "Minimal checker based on length.", inputs: [{ label: "Password", type: "password", id: "pass1" }] },
+        { id: 9, title: "Pos/Neg/Zero", desc: "Determine number sign.", inputs: [{ label: "Enter Number", type: "number", id: "num1" }] },
+        { id: 10, title: "Discount Calculator", desc: "Calculate discount (10% if amount > 1000).", inputs: [{ label: "Total Amount", type: "number", id: "num1" }] },
+        { id: 11, title: "Electricity Bill", desc: "Units based bill (1-100: $5, 101-200: $10, >200: $15).", inputs: [{ label: "Units Consumed", type: "number", id: "num1" }] },
+        { id: 12, title: "Login System", desc: "Simple mock auth (User: admin, Pass: 1234).", inputs: [{ label: "Username", type: "text", id: "user" }, { label: "Password", type: "password", id: "pass" }] },
+        { id: 13, title: "ATM Withdrawal", desc: "Check balance vs withdrawal.", inputs: [{ label: "Balance", type: "number", id: "bal" }, { label: "Withdrawal Amount", type: "number", id: "draw" }] },
+        { id: 14, title: "BMI Category", desc: "Calculate BMI and categorize.", inputs: [{ label: "Weight (kg)", type: "number", id: "w" }, { label: "Height (m)", type: "number", id: "h" }] },
+        { id: 15, title: "Triangle Type", desc: "Equilateral, Isosceles, or Scalene.", inputs: [{ label: "Side 1", type: "number", id: "s1" }, { label: "Side 2", type: "number", id: "s2" }, { label: "Side 3", type: "number", id: "s3" }] },
+        { id: 16, title: "Divisibility (3 & 5)", desc: "Check if divisible by both 3 and 5.", inputs: [{ label: "Number", type: "number", id: "num1" }] },
+        { id: 17, title: "Simple Chatbot", desc: "If-else based replies.", inputs: [{ label: "Ask (hello, time, help)", type: "text", id: "msg" }] },
+        { id: 18, title: "Food Ordering", desc: "Pick menu items.", inputs: [{ label: "Choice (1: Pizza, 2: Burger, 3: Pasta)", type: "number", id: "choice" }] },
+        { id: 19, title: "Traffic Signal", desc: "Next state simulator.", inputs: [{ label: "Current (Red, Green, Yellow)", type: "text", id: "color" }] },
+        { id: 20, title: "Student Pass/Fail", desc: "Threshold result.", inputs: [{ label: "Score (%)", type: "number", id: "num1" }] }
+    ];
+
+    let currentTaskId = 1;
+
+    // Build sidebar
+    const navList = document.getElementById('nav-list');
+    tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = `nav-item ${task.id === 1 ? 'active' : ''}`;
+        li.textContent = task.title;
+        li.onclick = () => loadTask(task.id);
+        navList.appendChild(li);
+    });
+
+    function loadTask(id) {
+        currentTaskId = id;
+        const task = tasks.find(t => t.id === id);
+        
+        // Update nav UI
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        const activeNav = Array.from(navList.children).find(li => li.textContent === task.title);
+        activeNav.classList.add('active');
+
+        // Update Content UI
+        document.getElementById('task-title').textContent = task.title;
+        document.getElementById('task-desc').textContent = task.desc;
+        
+        const container = document.getElementById('input-container');
+        container.innerHTML = '';
+        
+        task.inputs.forEach(inp => {
+            const group = document.createElement('div');
+            group.className = 'input-group';
+            group.innerHTML = `
+                <label for="${inp.id}">${inp.label}</label>
+                <input type="${inp.type}" id="${inp.id}" ${inp.maxlength ? 'maxlength="'+inp.maxlength+'"' : ''}>
+            `;
+            container.appendChild(group);
+        });
+
+        document.getElementById('result-display').textContent = 'Result will appear here...';
+        
+        // Trigger animation
+        const app = document.getElementById('app-container');
+        app.classList.remove('animate-fade');
+        void app.offsetWidth; // trigger reflow
+        app.classList.add('animate-fade');
+    }
+
+    function executeCurrentTask() {
+        const res = document.getElementById('result-display');
+        const vals = {};
+        tasks.find(t => t.id === currentTaskId).inputs.forEach(inp => {
+            vals[inp.id] = document.getElementById(inp.id).value;
+        });
+
+        let output = "";
+
+        switch(currentTaskId) {
+            case 1: 
+                const n1_1 = parseInt(vals.num1);
+                if (isNaN(n1_1)) output = "Please enter a valid number.";
+                else output = n1_1 % 2 === 0 ? `<b>${n1_1}</b> is Even.` : `<b>${n1_1}</b> is Odd.`;
+                break;
+            case 2:
+                const a2 = Number(vals.num1), b2 = Number(vals.num2), c2 = Number(vals.num3);
+                const max = Math.max(a2, b2, c2);
+                output = `The largest number is <b>${max}</b>.`;
+                break;
+            case 3:
+                const marks = Number(vals.num1);
+                if (marks >= 90) output = "Grade: <b>A+</b> (Excellent)";
+                else if (marks >= 80) output = "Grade: <b>A</b> (Very Good)";
+                else if (marks >= 70) output = "Grade: <b>B</b> (Good)";
+                else if (marks >= 60) output = "Grade: <b>C</b> (Fair)";
+                else if (marks >= 50) output = "Grade: <b>D</b> (Pass)";
+                else output = "Grade: <b>F</b> (Fail)";
+                break;
+            case 4:
+                const v1 = Number(vals.num1), v2 = Number(vals.num2), op = vals.op.trim();
+                if (op === '+') output = `Result: ${v1 + v2}`;
+                else if (op === '-') output = `Result: ${v1 - v2}`;
+                else if (op === '*') output = `Result: ${v1 * v2}`;
+                else if (op === '/') output = v2 !== 0 ? `Result: ${v1 / v2}` : "Cannot divide by zero!";
+                else output = "Invalid operator!";
+                break;
+            case 5:
+                const y = parseInt(vals.num1);
+                const isLeap = (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+                output = isLeap ? `<b>${y}</b> is a Leap Year.` : `<b>${y}</b> is NOT a Leap Year.`;
+                break;
+            case 6:
+                const ch = vals.char1.toLowerCase();
+                if ('aeiou'.includes(ch)) output = `<b>${ch}</b> is a Vowel.`;
+                else output = `<b>${ch}</b> is a Consonant.`;
+                break;
+            case 7:
+                const age = parseInt(vals.num1);
+                if (age >= 18) output = "Eligible to <b>Vote</b> and <b>Drive</b>.";
+                else if (age >= 16) output = "Eligible to <b>Drive</b> but not Vote.";
+                else output = "Not eligible to vote or drive yet.";
+                break;
+            case 8:
+                const pass = vals.pass1;
+                if (pass.length > 12) output = "Strength: <b>Strong</b> 💪";
+                else if (pass.length > 8) output = "Strength: <b>Medium</b> 🆗";
+                else output = "Strength: <b>Weak</b> (minimum 8 chars recommended)";
+                break;
+            case 9:
+                const num9 = Number(vals.num1);
+                if (num9 > 0) output = "The number is <b>Positive</b>.";
+                else if (num9 < 0) output = "The number is <b>Negative</b>.";
+                else output = "The number is <b>Zero</b>.";
+                break;
+            case 10:
+                const amt = Number(vals.num1);
+                if (amt > 1000) output = `Discount Applied! Final Price: <b>$${amt * 0.9}</b>`;
+                else output = `No discount. Price: <b>$${amt}</b>`;
+                break;
+            case 11:
+                const units = Number(vals.num1);
+                let bill = 0;
+                if (units <= 100) bill = units * 5;
+                else if (units <= 200) bill = (100 * 5) + (units - 100) * 10;
+                else bill = (100 * 5) + (100 * 10) + (units - 200) * 15;
+                output = `Total Electricity Bill: <b>$${bill}</b>`;
+                break;
+            case 12:
+                if (vals.user === 'admin' && vals.pass === '1234') output = "Login <b>Successful</b>! Welcome admin.";
+                else output = "Login <b>Failed</b>. Check credentials.";
+                break;
+            case 13:
+                const bal = Number(vals.bal), draw = Number(vals.draw);
+                if (draw > bal) output = "<b>Transaction Denied:</b> Insufficient balance.";
+                else output = `Withdrawal successful. Remaining: <b>$${bal - draw}</b>`;
+                break;
+            case 14:
+                const weight = Number(vals.w), height = Number(vals.h);
+                const bmi = weight / (height * height);
+                let cat = "";
+                if (bmi < 18.5) cat = "Underweight";
+                else if (bmi < 25) cat = "Normal weight";
+                else if (bmi < 30) cat = "Overweight";
+                else cat = "Obese";
+                output = `BMI: <b>${bmi.toFixed(2)}</b> (${cat})`;
+                break;
+            case 15:
+                const s1 = Number(vals.s1), s2 = Number(vals.s2), s3 = Number(vals.s3);
+                if (s1 === s2 && s2 === s3) output = "Triangle Type: <b>Equilateral</b>";
+                else if (s1 === s2 || s2 === s3 || s1 === s3) output = "Triangle Type: <b>Isosceles</b>";
+                else output = "Triangle Type: <b>Scalene</b>";
+                break;
+            case 16:
+                const n16 = parseInt(vals.num1);
+                if (n16 % 3 === 0 && n16 % 5 === 0) output = `<b>${n16}</b> is divisible by both 3 and 5.`;
+                else output = `<b>${n16}</b> is NOT divisible by both.`;
+                break;
+            case 17:
+                const msg = vals.msg.toLowerCase();
+                if (msg.includes('hello')) output = "Bot: Hello! How can I help you today?";
+                else if (msg.includes('time')) output = `Bot: Current time is ${new Date().toLocaleTimeString()}.`;
+                else if (msg.includes('help')) output = "Bot: I can help with arithmetic, logic, and more!";
+                else output = "Bot: I'm not sure how to respond to that yet.";
+                break;
+            case 18:
+                const c = parseInt(vals.choice);
+                if (c === 1) output = "Order: <b>Pizza</b>. Preparing now! 🍕";
+                else if (c === 2) output = "Order: <b>Burger</b>. Almost ready! 🍔";
+                else if (c === 3) output = "Order: <b>Pasta</b>. Boiling! 🍝";
+                else output = "Invalid Choice. Please pick 1, 2, or 3.";
+                break;
+            case 19:
+                const col = vals.color.toLowerCase();
+                if (col === 'red') output = "State: Stop! Next: <b>Green</b>";
+                else if (col === 'green') output = "State: Go! Next: <b>Yellow</b>";
+                else if (col === 'yellow') output = "State: Slow down! Next: <b>Red</b>";
+                else output = "Invalid signal color.";
+                break;
+            case 20:
+                const score = Number(vals.num1);
+                output = score >= 40 ? `Result: <b>PASS</b> 🎉 (${score}%)` : `Result: <b>FAIL</b> ❌ (${score}%)`;
+                break;
+        }
+
+        res.innerHTML = output;
+
+        // Visual feedback
+        res.parentElement.style.borderLeftColor = output.includes("Fail") || output.includes("Denied") || output.includes("Invalid") || output.includes("NOT") ? "var(--error)" : "var(--success)";
+    }
+
+    // Initialize first task
+    loadTask(1);
+</script>
+
+</body>
+</html>

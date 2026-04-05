@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Projects - OOP Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #f8fafc;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --error: #ef4444;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); display: flex; min-height: 100vh; }
+        .sidebar { width:280px; background-color:var(--sidebar-bg); color:var(--sidebar-text); display:flex; flex-direction:column; padding:1.5rem; position:fixed; height:100vh; overflow-y:auto; border-right:1px solid var(--border); }
+        .sidebar h2 { font-family:'Outfit', sans-serif; font-size:1.5rem; margin-bottom:2rem; color:#fff; display:flex; align-items:center; gap:10px; }
+        .sidebar h2::before { content: '🏛️'; }
+        .nav-list { list-style:none; }
+        .nav-item { padding:0.75rem 1rem; margin-bottom:0.4rem; border-radius:8px; cursor:pointer; transition:all 0.2s; font-size:0.9rem; color:#94a3b8; }
+        .nav-item:hover { background-color:rgba(255,255,255,0.05); color:#fff; }
+        .nav-item.active { background-color:var(--primary); color:#fff; font-weight:600; }
+        .main-content { flex:1; margin-left:280px; padding:3rem; display:flex; flex-direction:column; align-items:center; }
+        .container { max-width:800px; width:100%; }
+        .header { margin-bottom:2rem; width:100%; }
+        .header h1 { font-family:'Outfit', sans-serif; font-size:2.2rem; color:#fff; }
+        .card { background:var(--card-bg); padding:2rem; border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border); width:100%; }
+        .input-group { margin-bottom:1.5rem; }
+        .input-group label { display:block; font-weight:600; margin-bottom:0.5rem; color:var(--text-muted); }
+        .input-group input { width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; background:#0f172a; color:#fff; font-size:1rem; }
+        .btn { background:var(--primary); color:#fff; border:none; padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; width:100%; font-size:1rem; transition: background 0.3s; }
+        .btn:hover { background:var(--primary-hover); }
+        .result { margin-top:1.5rem; padding:1.5rem; border-radius:12px; background:#0f172a; border-left:4px solid var(--primary); font-family:'Courier New', monospace; white-space: pre-wrap; font-size: 1rem; color: #38bdf8; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width:0; display:none; }
+            .main-content { margin-left:0; padding:1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <h2>OOP Projects</h2>
+    <ul class="nav-list" id="nav-list"></ul>
+</aside>
+
+<main class="main-content">
+    <div class="container" id="app-container">
+        <div class="header">
+            <h1 id="task-title">Select a Class</h1>
+            <p id="task-desc">Choose an OOP project from the sidebar.</p>
+        </div>
+        <div class="card">
+            <div id="input-container"></div>
+            <button class="btn" onclick="executeCurrentTask()" id="run-btn">Instantiate & Run</button>
+            <div class="result" id="result-display">Object state and methods logs...</div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const tasks = [
+        { id: 1, title: "Student Class", desc: "Create Student object with Name/Marks.", inputs: [{ label: "Name", type: "text", id: "o1" }, { label: "Marks (comma list)", type: "text", id: "o2" }] },
+        { id: 2, title: "Bank Account", desc: "Deposit and Withdraw logic.", inputs: [{ label: "Initial Balance", type: "number", id: "o1" }, { label: "Deposit Amount", type: "number", id: "o2" }, { label: "Withdrawal", type: "number", id: "o3" }] },
+        { id: 3, title: "Employee Class", desc: "Salary management and Bonus.", inputs: [{ label: "Base Salary", type: "number", id: "o1" }, { label: "Bonus Percentage", type: "number", id: "o2" }] },
+        { id: 4, title: "Library System", desc: "Book class with lend/return status.", inputs: [{ label: "Book Title", type: "text", id: "o1" }, { label: "Borrowed? (y/n)", type: "text", id: "o2" }] },
+        { id: 5, title: "Shopping Cart Class", desc: "Object oriented cart with items list.", inputs: [{ label: "Items to Add (item:price, item:price)", type: "text", id: "o1" }] }
+    ];
+
+    let currentTaskId = 1;
+
+    // JavaScript OOP Implementations for Demo
+    class Student {
+        constructor(name, marks) {
+            this.name = name;
+            this.marks = marks.split(',').map(Number);
+        }
+        getAvg() {
+            let sum = this.marks.reduce((a,b) => a+b, 0);
+            return (sum / this.marks.length).toFixed(2);
+        }
+        display() {
+            return `Student: ${this.name}\nMarks: [${this.marks}]\nAverage: ${this.getAvg()}`;
+        }
+    }
+
+    class BankAccount {
+        constructor(balance) { this.balance = balance; }
+        deposit(amt) { if(amt > 0) this.balance += amt; }
+        withdraw(amt) { if(amt <= this.balance) this.balance -= amt; else return "Insufficient Funds"; }
+        getSummary() { return `Balance: $${this.balance}`; }
+    }
+
+    class Employee {
+        constructor(base) { this.base = base; }
+        calcBonus(percent) { return this.base * (percent/100); }
+        getTotal(percent) { return this.base + this.calcBonus(percent); }
+    }
+
+    const navList = document.getElementById('nav-list');
+    tasks.forEach(t => {
+        const li = document.createElement('li');
+        li.className = `nav-item ${t.id === 1 ? 'active' : ''}`;
+        li.textContent = t.title;
+        li.onclick = () => loadTask(t.id);
+        navList.appendChild(li);
+    });
+
+    function loadTask(id) {
+        currentTaskId = id;
+        const task = tasks.find(t => t.id === id);
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        Array.from(navList.children).find(li => li.textContent === task.title).classList.add('active');
+        document.getElementById('task-title').textContent = task.title;
+        document.getElementById('task-desc').textContent = task.desc;
+        const container = document.getElementById('input-container');
+        container.innerHTML = '';
+        task.inputs.forEach(inp => {
+            const group = document.createElement('div');
+            group.className = 'input-group';
+            group.innerHTML = `<label>${inp.label}</label><input type="${inp.type}" id="${inp.id}">`;
+            container.appendChild(group);
+        });
+        document.getElementById('result-display').textContent = 'Object state and methods logs...';
+    }
+
+    function executeCurrentTask() {
+        const res = document.getElementById('result-display');
+        const v1 = document.getElementById('o1')?.value;
+        const v2 = document.getElementById('o2')?.value;
+        const v3 = document.getElementById('o3')?.value;
+
+        let output = "";
+        switch(currentTaskId) {
+            case 1:
+                let s = new Student(v1, v2);
+                output = s.display();
+                break;
+            case 2:
+                let acc = new BankAccount(Number(v1));
+                let d = Number(v2);
+                let w = Number(v3);
+                acc.deposit(d);
+                let err = acc.withdraw(w);
+                output = `Account Logs:\n- Initial: $${v1}\n- Deposit: $${v2}\n- Withdraw: $${v3}\n${err ? '- ERROR: ' + err + '\n' : ''}- Final ${acc.getSummary()}`;
+                break;
+            case 3:
+                let emp = new Employee(Number(v1));
+                output = `Employee Payroll:\n- Base: $${v1}\n- Bonus (${v2}%): $${emp.calcBonus(v2)}\n- Total: $${emp.getTotal(v2)}`;
+                break;
+            case 4:
+                let status = v2.toLowerCase() === 'y' ? "Borrowed" : "Available";
+                output = `Book Instance:\n- Title: ${v1}\n- Status: ${status}\n- Action: ${status === 'Available' ? 'Ready to Lend' : 'Wait for Return'}`;
+                break;
+            case 5:
+                let items = v1.split(',').map(x => {
+                    let [name, price] = x.split(':').map(val => val.trim());
+                    return {name, price: Number(price)};
+                });
+                let total = items.reduce((a,b) => a + b.price, 0);
+                output = `Shopping Cart Instance:\nItems:\n${items.map(i => `- ${i.name}: $${i.price}`).join('\n')}\nTotal: $${total}`;
+                break;
+        }
+        res.innerHTML = output;
+    }
+    loadTask(1);
+</script>
+</body>
+</html>

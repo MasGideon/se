@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Projects - Tuples Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --bg: #f5f3ff;
+            --sidebar-bg: #4c1d95;
+            --sidebar-text: #f5f3ff;
+            --card-bg: #ffffff;
+            --text-main: #2e1065;
+            --text-muted: #7c3aed;
+            --border: #ddd6fe;
+            --success: #10b981;
+            --error: #ef4444;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); display: flex; min-height: 100vh; }
+        .sidebar { width:280px; background-color:var(--sidebar-bg); color:var(--sidebar-text); display:flex; flex-direction:column; padding:1.5rem; position:fixed; height:100vh; overflow-y:auto; }
+        .sidebar h2 { font-family:'Outfit', sans-serif; font-size:1.5rem; margin-bottom:2rem; color:#fff; display:flex; align-items:center; gap:10px; }
+        .sidebar h2::before { content: '📦'; }
+        .nav-list { list-style:none; }
+        .nav-item { padding:0.75rem 1rem; margin-bottom:0.4rem; border-radius:8px; cursor:pointer; transition:all 0.2s; font-size:0.9rem; color:#ddd6fe; }
+        .nav-item:hover { background-color:rgba(255,255,255,0.1); color:#fff; }
+        .nav-item.active { background-color:var(--primary); color:#fff; font-weight:600; }
+        .main-content { flex:1; margin-left:280px; padding:3rem; display:flex; flex-direction:column; align-items:center; }
+        .container { max-width:800px; width:100%; }
+        .header { margin-bottom:2rem; width:100%; }
+        .header h1 { font-family:'Outfit', sans-serif; font-size:2.2rem; }
+        .card { background:var(--card-bg); padding:2rem; border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border); width:100%; }
+        .input-group { margin-bottom:1.5rem; }
+        .input-group label { display:block; font-weight:600; margin-bottom:0.5rem; color:var(--text-main); }
+        .input-group input { width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; background:#f9fafb; font-size:1rem; }
+        .btn { background:var(--primary); color:#fff; border:none; padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; width:100%; font-size:1rem; }
+        .btn:hover { background:var(--primary-hover); }
+        .result { margin-top:1.5rem; padding:1.5rem; border-radius:12px; background:#f5f3ff; border-left:4px solid var(--primary); font-family:'Courier New', monospace; white-space: pre-wrap; font-size: 1rem; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width:0; display:none; }
+            .main-content { margin-left:0; padding:1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <h2>Tuple Projects</h2>
+    <ul class="nav-list" id="nav-list"></ul>
+</aside>
+
+<main class="main-content">
+    <div class="container" id="app-container">
+        <div class="header">
+            <h1 id="task-title">Select a Task</h1>
+            <p id="task-desc">Choose a tuple project from the sidebar.</p>
+        </div>
+        <div class="card">
+            <div id="input-container"></div>
+            <button class="btn" onclick="executeCurrentTask()" id="run-btn">Execute Tuple Logic</button>
+            <div class="result" id="result-display">Logs and outputs will appear here...</div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const tasks = [
+        { id: 1, title: "Student Data Tuple", desc: "Store Name, Age, Grade in a tuple-like format.", inputs: [{ label: "Name", type: "text", id: "t1" }, { label: "Age", type: "number", id: "t2" }, { label: "Grade", type: "text", id: "t3" }] },
+        { id: 2, title: "Tuple Unpacking", desc: "Extract values into variables.", inputs: [{ label: "Tuple Data (A,B,C)", type: "text", id: "t1" }] },
+        { id: 3, title: "Count Elements", desc: "Count occurrences in tuple.", inputs: [{ label: "Tuple Items", type: "text", id: "t1" }, { label: "Target", type: "text", id: "t2" }] },
+        { id: 4, title: "Max/Min in Tuple", desc: "Find range in numeric tuple.", inputs: [{ label: "Numbers", type: "text", id: "t1" }] },
+        { id: 5, title: "List to Tuple", desc: "Convert dynamic list to immutable tuple sim.", inputs: [{ label: "List Items", type: "text", id: "t1" }] },
+        { id: 6, title: "Tuple Slicing", desc: "Get subset of tuple (Start:End).", inputs: [{ label: "Items", type: "text", id: "t1" }, { label: "Start Index", type: "number", id: "t2" }, { label: "End Index", type: "number", id: "t3" }] },
+        { id: 7, title: "Nested Tuple Access", desc: "Access ((A,B), (C,D)).", inputs: [{ label: "Nested Values (A,B | C,D)", type: "text", id: "t1" }] },
+        { id: 8, title: "Immutable Demo", desc: "Try to 'modify' and show failure/copy.", inputs: [{ label: "Value to Change", type: "text", id: "t1" }] },
+        { id: 9, title: "Coordinates System", desc: "Manage (X, Y) points.", inputs: [{ label: "X Coordinate", type: "number", id: "t1" }, { label: "Y Coordinate", type: "number", id: "t2" }] },
+        { id: 10, title: "Swap using Tuple", desc: "Swap A and B using (A, B) = (B, A).", inputs: [{ label: "Value A", type: "text", id: "t1" }, { label: "Value B", type: "text", id: "t2" }] }
+    ];
+
+    let currentTaskId = 1;
+    const navList = document.getElementById('nav-list');
+    tasks.forEach(t => {
+        const li = document.createElement('li');
+        li.className = `nav-item ${t.id === 1 ? 'active' : ''}`;
+        li.textContent = t.title;
+        li.onclick = () => loadTask(t.id);
+        navList.appendChild(li);
+    });
+
+    function loadTask(id) {
+        currentTaskId = id;
+        const task = tasks.find(t => t.id === id);
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        Array.from(navList.children).find(li => li.textContent === task.title).classList.add('active');
+        document.getElementById('task-title').textContent = task.title;
+        document.getElementById('task-desc').textContent = task.desc;
+        const container = document.getElementById('input-container');
+        container.innerHTML = '';
+        task.inputs.forEach(inp => {
+            const group = document.createElement('div');
+            group.className = 'input-group';
+            group.innerHTML = `<label>${inp.label}</label><input type="${inp.type}" id="${inp.id}">`;
+            container.appendChild(group);
+        });
+        document.getElementById('result-display').textContent = 'Result will appear here...';
+    }
+
+    function executeCurrentTask() {
+        const res = document.getElementById('result-display');
+        const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : '';
+        const v1 = getVal('t1');
+        const v2 = getVal('t2');
+        const v3 = getVal('t3');
+
+        let output = "";
+        switch(currentTaskId) {
+            case 1:
+                let student = `("${v1}", ${v2}, "${v3}")`;
+                output = `Stored Tuple: ${student}`;
+                break;
+            case 2:
+                let parts = v1.split(',');
+                if (parts.length < 3) output = "Please enter at least 3 values.";
+                else output = `Unpacked:\nVar A: ${parts[0]}\nVar B: ${parts[1]}\nVar C: ${parts[2]}`;
+                break;
+            case 3:
+                let items3 = v1.split(',').map(x => x.trim());
+                let count3 = items3.filter(x => x === v2.trim()).length;
+                output = `Tuple: (${items3.join(', ')})\n"${v2}" appears ${count3} times.`;
+                break;
+            case 4:
+                let nums4 = v1.split(',').map(Number);
+                output = `Tuple Range:\nMax: ${Math.max(...nums4)}\nMin: ${Math.min(...nums4)}`;
+                break;
+            case 5:
+                let list5 = v1.split(',');
+                let tuple5 = `(${list5.join(', ')})`;
+                output = `Converted to Tuple: ${tuple5}`;
+                break;
+            case 6:
+                let items6 = v1.split(',');
+                let slice = items6.slice(parseInt(v2), parseInt(v3));
+                output = `Tuple Slice [${v2}:${v3}]: (${slice.join(', ')})`;
+                break;
+            case 7:
+                let nested = v1.split('|').map(x => `(${x.trim()})`);
+                output = `Nested Tuple: (${nested.join(', ')})\nAccess [1][0]: ${v1.split('|')[1]?.split(',')[0] || "N/A"}`;
+                break;
+            case 8:
+                output = `Simulating Immutability:\nTuple: ("fixed", "data")\nAttempting: tuple[0] = "${v1}"\nError: 'tuple' object does not support item assignment.`;
+                break;
+            case 9:
+                output = `Point stored as tuple: (${v1}, ${v2})\nDistance from origin: ${Math.sqrt(v1*v1 + v2*v2).toFixed(2)}`;
+                break;
+            case 10:
+                let a = v1, b = v2;
+                output = `Before: A=${a}, B=${b}\nSwapping using tuple: (A, B) = (B, A)\nAfter: A=${b}, B=${a}`;
+                break;
+        }
+        res.innerHTML = output;
+    }
+    loadTask(1);
+</script>
+</body>
+</html>

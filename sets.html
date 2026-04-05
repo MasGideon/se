@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Projects - Sets Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --primary-hover: #d97706;
+            --bg: #fffbeb;
+            --sidebar-bg: #451a03;
+            --sidebar-text: #fffbeb;
+            --card-bg: #ffffff;
+            --text-main: #451a03;
+            --text-muted: #d97706;
+            --border: #fef3c7;
+            --success: #10b981;
+            --error: #ef4444;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); display: flex; min-height: 100vh; }
+        .sidebar { width:280px; background-color:var(--sidebar-bg); color:var(--sidebar-text); display:flex; flex-direction:column; padding:1.5rem; position:fixed; height:100vh; overflow-y:auto; }
+        .sidebar h2 { font-family:'Outfit', sans-serif; font-size:1.5rem; margin-bottom:2rem; color:#fff; display:flex; align-items:center; gap:10px; }
+        .sidebar h2::before { content: '⭕'; }
+        .nav-list { list-style:none; }
+        .nav-item { padding:0.75rem 1rem; margin-bottom:0.4rem; border-radius:8px; cursor:pointer; transition:all 0.2s; font-size:0.9rem; color:#fef3c7; }
+        .nav-item:hover { background-color:rgba(255,255,255,0.1); color:#fff; }
+        .nav-item.active { background-color:var(--primary); color:#fff; font-weight:600; }
+        .main-content { flex:1; margin-left:280px; padding:3rem; display:flex; flex-direction:column; align-items:center; }
+        .container { max-width:800px; width:100%; }
+        .header { margin-bottom:2rem; width:100%; }
+        .header h1 { font-family:'Outfit', sans-serif; font-size:2.2rem; }
+        .card { background:var(--card-bg); padding:2rem; border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border); width:100%; }
+        .input-group { margin-bottom:1.5rem; }
+        .input-group label { display:block; font-weight:600; margin-bottom:0.5rem; color:var(--text-main); }
+        .input-group input { width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; background:#f9fafb; font-size:1rem; }
+        .btn { background:var(--primary); color:#fff; border:none; padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; width:100%; font-size:1rem; }
+        .btn:hover { background:var(--primary-hover); }
+        .result { margin-top:1.5rem; padding:1.5rem; border-radius:12px; background:#fffbeb; border-left:4px solid var(--primary); font-family:'Courier New', monospace; white-space: pre-wrap; font-size: 1rem; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width:0; display:none; }
+            .main-content { margin-left:0; padding:1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <h2>Set Projects</h2>
+    <ul class="nav-list" id="nav-list"></ul>
+</aside>
+
+<main class="main-content">
+    <div class="container" id="app-container">
+        <div class="header">
+            <h1 id="task-title">Select a Task</h1>
+            <p id="task-desc">Choose a set project from the sidebar.</p>
+        </div>
+        <div class="card">
+            <div id="input-container"></div>
+            <button class="btn" onclick="executeCurrentTask()" id="run-btn">Execute Set Operation</button>
+            <div class="result" id="result-display">Logs and outputs will appear here...</div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const tasks = [
+        { id: 1, title: "Remove Duplicates", desc: "Keep only unique items using Set operations.", inputs: [{ label: "Input (A,B,A,C,B)", type: "text", id: "s1" }] },
+        { id: 2, title: "Union of Sets", desc: "Combine items from both sets (unique).", inputs: [{ label: "Set A", type: "text", id: "s1" }, { label: "Set B", type: "text", id: "s2" }] },
+        { id: 3, title: "Intersection", desc: "Find common elements.", inputs: [{ label: "Set A", type: "text", id: "s1" }, { label: "Set B", type: "text", id: "s2" }] },
+        { id: 4, title: "Difference", desc: "Find items in A but not in B.", inputs: [{ label: "Set A", type: "text", id: "s1" }, { label: "Set B", type: "text", id: "s2" }] },
+        { id: 5, title: "Symmetric Difference", desc: "Items in A or B but not both.", inputs: [{ label: "Set A", type: "text", id: "s1" }, { label: "Set B", type: "text", id: "s2" }] },
+        { id: 6, title: "Subset/Superset", desc: "Check containment rules.", inputs: [{ label: "Set A", type: "text", id: "s1" }, { label: "Set B", type: "text", id: "s2" }] },
+        { id: 7, title: "Unique Word Finder", desc: "Count unique words in a sentence.", inputs: [{ label: "Sentence", type: "text", id: "s1" }] },
+        { id: 8, title: "Attendance System", desc: "Record today's present students.", inputs: [{ label: "Present Students", type: "text", id: "s1" }, { label: "Total List", type: "text", id: "s2" }] },
+        { id: 9, title: "Common Friends", desc: "Compare friend lists.", inputs: [{ label: "User A Friends", type: "text", id: "s1" }, { label: "User B Friends", type: "text", id: "s2" }] },
+        { id: 10, title: "Set Voting System", desc: "Count distinct votes.", inputs: [{ label: "Votes", type: "text", id: "s1" }] }
+    ];
+
+    let currentTaskId = 1;
+    const navList = document.getElementById('nav-list');
+    tasks.forEach(t => {
+        const li = document.createElement('li');
+        li.className = `nav-item ${t.id === 1 ? 'active' : ''}`;
+        li.textContent = t.title;
+        li.onclick = () => loadTask(t.id);
+        navList.appendChild(li);
+    });
+
+    function loadTask(id) {
+        currentTaskId = id;
+        const task = tasks.find(t => t.id === id);
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        Array.from(navList.children).find(li => li.textContent === task.title).classList.add('active');
+        document.getElementById('task-title').textContent = task.title;
+        document.getElementById('task-desc').textContent = task.desc;
+        const container = document.getElementById('input-container');
+        container.innerHTML = '';
+        task.inputs.forEach(inp => {
+            const group = document.createElement('div');
+            group.className = 'input-group';
+            group.innerHTML = `<label>${inp.label}</label><input type="${inp.type}" id="${inp.id}">`;
+            container.appendChild(group);
+        });
+        document.getElementById('result-display').textContent = 'Result will appear here...';
+    }
+
+    function executeCurrentTask() {
+        const res = document.getElementById('result-display');
+        const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : '';
+        const s1_raw = getVal('s1').split(',').map(x => x.trim()).filter(x => x !== '');
+        const s2_raw = getVal('s2').split(',').map(x => x.trim()).filter(x => x !== '');
+        
+        const setA = new Set(s1_raw);
+        const setB = new Set(s2_raw);
+
+        let output = "";
+        switch(currentTaskId) {
+            case 1:
+                output = `Set: {${Array.from(setA).join(', ')}}\nUnique Length: ${setA.size}`;
+                break;
+            case 2:
+                let union = new Set([...setA, ...setB]);
+                output = `Union A | B: {${Array.from(union).sort().join(', ')}}`;
+                break;
+            case 3:
+                let intersect = new Set([...setA].filter(x => setB.has(x)));
+                output = `Intersection A & B: {${Array.from(intersect).sort().join(', ')}}`;
+                break;
+            case 4:
+                let diff = new Set([...setA].filter(x => !setB.has(x)));
+                output = `Difference A - B: {${Array.from(diff).sort().join(', ')}}`;
+                break;
+            case 5:
+                let symDiff = new Set([...setA].filter(x => !setB.has(x)).concat([...setB].filter(x => !setA.has(x))));
+                output = `Symmetric Difference: {${Array.from(symDiff).sort().join(', ')}}`;
+                break;
+            case 6:
+                let isSubset = Array.from(setA).every(val => setB.has(val));
+                output = `A is subset of B: ${isSubset}\nB is superset of A: ${isSubset}`;
+                break;
+            case 7:
+                let words = new Set(getVal('s1').toLowerCase().split(/\s+/).filter(x => x !== ''));
+                output = `Unique Words: {${Array.from(words).join(', ')}}\nCount: ${words.size}`;
+                break;
+            case 8:
+                let absent = new Set([...setB].filter(x => !setA.has(x)));
+                output = `Absent: {${Array.from(absent).join(', ')}}\nPresent Count: ${setA.size}`;
+                break;
+            case 9:
+                let common = new Set([...setA].filter(x => setB.has(x)));
+                output = `Common Friends: {${Array.from(common).join(', ')}}\nMutual Count: ${common.size}`;
+                break;
+            case 10:
+                output = `Distinct Votes: {${Array.from(setA).join(', ')}}\nTotal Unique Voters: ${setA.size}`;
+                break;
+        }
+        res.innerHTML = output;
+    }
+    loadTask(1);
+</script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Projects - Lists Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --bg: #f0fdf4;
+            --sidebar-bg: #064e3b;
+            --sidebar-text: #f0fdf4;
+            --card-bg: #ffffff;
+            --text-main: #064e3b;
+            --text-muted: #34d399;
+            --border: #d1fae5;
+            --success: #10b981;
+            --error: #ef4444;
+            --shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); display: flex; min-height: 100vh; }
+        .sidebar { width:280px; background-color:var(--sidebar-bg); color:var(--sidebar-text); display:flex; flex-direction:column; padding:1.5rem; position:fixed; height:100vh; overflow-y:auto; }
+        .sidebar h2 { font-family:'Outfit', sans-serif; font-size:1.5rem; margin-bottom:2rem; color:#fff; display:flex; align-items:center; gap:10px; }
+        .sidebar h2::before { content: '📋'; }
+        .nav-list { list-style:none; }
+        .nav-item { padding:0.75rem 1rem; margin-bottom:0.4rem; border-radius:8px; cursor:pointer; transition:all 0.2s; font-size:0.9rem; color:#d1fae5; }
+        .nav-item:hover { background-color:rgba(255,255,255,0.1); color:#fff; }
+        .nav-item.active { background-color:var(--primary); color:#fff; font-weight:600; }
+        .main-content { flex:1; margin-left:280px; padding:3rem; display:flex; flex-direction:column; align-items:center; }
+        .container { max-width:800px; width:100%; }
+        .header { margin-bottom:2rem; width:100%; }
+        .header h1 { font-family:'Outfit', sans-serif; font-size:2.2rem; }
+        .card { background:var(--card-bg); padding:2rem; border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border); width:100%; }
+        .input-group { margin-bottom:1.5rem; }
+        .input-group label { display:block; font-weight:600; margin-bottom:0.5rem; color:var(--text-main); }
+        .input-group input, .input-group textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; background:#f9fafb; font-size:1rem; }
+        .btn { background:var(--primary); color:#fff; border:none; padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; width:100%; font-size:1rem; }
+        .btn:hover { background:var(--primary-hover); }
+        .result { margin-top:1.5rem; padding:1.5rem; border-radius:12px; background:#f0fdf4; border-left:4px solid var(--primary); font-family:'Courier New', monospace; white-space: pre-wrap; font-size: 1rem; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width:0; display:none; }
+            .main-content { margin-left:0; padding:1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <h2>List Projects</h2>
+    <ul class="nav-list" id="nav-list"></ul>
+</aside>
+
+<main class="main-content">
+    <div class="container" id="app-container">
+        <div class="header">
+            <h1 id="task-title">Select a Task</h1>
+            <p id="task-desc">Choose a list project from the sidebar.</p>
+        </div>
+        <div class="card">
+            <div id="input-container"></div>
+            <button class="btn" onclick="executeCurrentTask()" id="run-btn">Execute List Operation</button>
+            <div class="result" id="result-display">Logs and outputs will appear here...</div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const tasks = [
+        { id: 1, title: "Marks & Average", desc: "Calculate average from comma-separated marks.", inputs: [{ label: "Marks (e.g. 80,90,75,100)", type: "text", id: "list1" }] },
+        { id: 2, title: "Max/Min Finder", desc: "Find highest and lowest value.", inputs: [{ label: "List", type: "text", id: "list1" }] },
+        { id: 3, title: "Remove Duplicates", desc: "Keep only unique elements.", inputs: [{ label: "List", type: "text", id: "list1" }] },
+        { id: 4, title: "Sort Manually", desc: "Ascending order sort simulation.", inputs: [{ label: "List", type: "text", id: "list1" }] },
+        { id: 5, title: "Merge Lists", desc: "Combine two lists.", inputs: [{ label: "List A", type: "text", id: "list1" }, { label: "List B", type: "text", id: "list2" }] },
+        { id: 6, title: "List Even Numbers", desc: "Filter even numbers from input.", inputs: [{ label: "List", type: "text", id: "list1" }] },
+        { id: 7, title: "Reverse List", desc: "Invert the order of items.", inputs: [{ label: "List", type: "text", id: "list1" }] },
+        { id: 8, title: "Second Largest", desc: "Find the element just below max.", inputs: [{ label: "List", type: "text", id: "list1" }] },
+        { id: 9, title: "Count Occurrences", desc: "Frequency of a target value.", inputs: [{ label: "List", type: "text", id: "list1" }, { label: "Target", type: "text", id: "target" }] },
+        { id: 10, title: "List Search", desc: "Find index of element.", inputs: [{ label: "List", type: "text", id: "list1" }, { label: "Search For", type: "text", id: "target" }] },
+        { id: 11, title: "Shopping Cart", desc: "Add/Remove items (Comma-List sim).", inputs: [{ label: "Cart", type: "text", id: "list1" }, { label: "New Item", type: "text", id: "target" }] },
+        { id: 12, title: "To-Do List", desc: "Add task to list.", inputs: [{ label: "Current Tasks", type: "text", id: "list1" }, { label: "Task", type: "text", id: "target" }] },
+        { id: 13, title: "Movie Ratings", desc: "Filter movies > 7.0.", inputs: [{ label: "Ratings (comma-sep)", type: "text", id: "list1" }] },
+        { id: 14, title: "Contact List", desc: "Search for name in contacts.", inputs: [{ label: "Names", type: "text", id: "list1" }, { label: "Search", type: "text", id: "target" }] },
+        { id: 15, title: "Student Record", desc: "Filter students passing (>40).", inputs: [{ label: "Scores", type: "text", id: "list1" }] },
+        { id: 16, title: "Random List Generator", desc: "Create list of random N numbers.", inputs: [{ label: "Count (N)", type: "number", id: "count" }] },
+        { id: 17, title: "List Filter (Even/Odd)", desc: "Split into two lists.", inputs: [{ label: "Input List", type: "text", id: "list1" }] },
+        { id: 18, title: "Expense Tracker", desc: "Sum expenses.", inputs: [{ label: "Prices", type: "text", id: "list1" }] },
+        { id: 19, title: "List Rotation", desc: "Shift elements by N.", inputs: [{ label: "List", type: "text", id: "list1" }, { label: "Shift By", type: "number", id: "count" }] },
+        { id: 20, title: "List Comparison", desc: "Common vs Different.", inputs: [{ label: "List 1", type: "text", id: "list1" }, { label: "List 2", type: "text", id: "list2" }] }
+    ];
+
+    let currentTaskId = 1;
+    const navList = document.getElementById('nav-list');
+    tasks.forEach(t => {
+        const li = document.createElement('li');
+        li.className = `nav-item ${t.id === 1 ? 'active' : ''}`;
+        li.textContent = t.title;
+        li.onclick = () => loadTask(t.id);
+        navList.appendChild(li);
+    });
+
+    function loadTask(id) {
+        currentTaskId = id;
+        const task = tasks.find(t => t.id === id);
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        Array.from(navList.children).find(li => li.textContent === task.title).classList.add('active');
+        document.getElementById('task-title').textContent = task.title;
+        document.getElementById('task-desc').textContent = task.desc;
+        const container = document.getElementById('input-container');
+        container.innerHTML = '';
+        task.inputs.forEach(inp => {
+            const group = document.createElement('div');
+            group.className = 'input-group';
+            group.innerHTML = `<label>${inp.label}</label><input type="${inp.type}" id="${inp.id}">`;
+            container.appendChild(group);
+        });
+        document.getElementById('result-display').textContent = 'Result will appear here...';
+    }
+
+    function executeCurrentTask() {
+        const res = document.getElementById('result-display');
+        const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : '';
+        const list1 = getVal('list1').split(',').filter(x => x.trim() !== '');
+        const list2 = getVal('list2').split(',').filter(x => x.trim() !== '');
+        const target = getVal('target');
+        const count = parseInt(getVal('count')) || 0;
+
+        let output = "";
+        switch(currentTaskId) {
+            case 1:
+                let nums1 = list1.map(Number);
+                let avg = nums1.reduce((a,b) => a+b, 0) / nums1.length;
+                output = `Average: ${avg.toFixed(2)}`;
+                break;
+            case 2:
+                let nums2 = list1.map(Number);
+                output = `Max: ${Math.max(...nums2)}\nMin: ${Math.min(...nums2)}`;
+                break;
+            case 3:
+                output = `Unique items: ${[...new Set(list1)].join(', ')}`;
+                break;
+            case 4:
+                output = `Sorted: ${list1.sort((a,b) => Number(a)-Number(b)).join(', ')}`;
+                break;
+            case 5:
+                output = `Merged: ${list1.concat(list2).join(', ')}`;
+                break;
+            case 6:
+                output = `Evens: ${list1.filter(x => Number(x)%2 === 0).join(', ')}`;
+                break;
+            case 7:
+                output = `Reversed: ${[...list1].reverse().join(', ')}`;
+                break;
+            case 8:
+                let uniq8 = [...new Set(list1.map(Number))].sort((a,b) => b-a);
+                output = uniq8[1] !== undefined ? `Second Largest: ${uniq8[1]}` : "Not enough unique values.";
+                break;
+            case 9:
+                let c9 = list1.filter(x => x.trim() === target.trim()).length;
+                output = `"${target}" occurs ${c9} times.`;
+                break;
+            case 10:
+                let idx10 = list1.indexOf(target);
+                output = idx10 !== -1 ? `Found at index: ${idx10}` : "Not found in list.";
+                break;
+            case 11:
+                let cart = [...list1, target];
+                output = `Cart Updated: ${cart.join(', ')}`;
+                break;
+            case 12:
+                output = `Todo: ${[...list1, target].join(' | ')}`;
+                break;
+            case 13:
+                output = `Highly Rated: ${list1.filter(x => Number(x) > 7).join(', ')}`;
+                break;
+            case 14:
+                let found14 = list1.filter(x => x.toLowerCase().includes(target.toLowerCase()));
+                output = found14.length ? `Found: ${found14.join(', ')}` : "No matches found.";
+                break;
+            case 15:
+                output = `Passing: ${list1.filter(x => Number(x) >= 40).join(', ')}`;
+                break;
+            case 16:
+                let rnd = Array.from({length: count}, () => Math.floor(Math.random() * 100));
+                output = `Generated List: ${rnd.join(', ')}`;
+                break;
+            case 17:
+                let e17 = list1.filter(x => Number(x)%2 === 0);
+                let o17 = list1.filter(x => Number(x)%2 !== 0);
+                output = `Evens: ${e17.join(', ')}\nOdds: ${o17.join(', ')}`;
+                break;
+            case 18:
+                output = `Total Expense: $${list1.reduce((a,b) => a+Number(b), 0)}`;
+                break;
+            case 19:
+                let rot = [...list1];
+                for(let i=0; i<count; i++) rot.push(rot.shift());
+                output = `Rotated List: ${rot.join(', ')}`;
+                break;
+            case 20:
+                let common = list1.filter(x => list2.includes(x));
+                let diff = list1.filter(x => !list2.includes(x)).concat(list2.filter(x => !list1.includes(x)));
+                output = `Common: ${common.join(', ')}\nDifferent: ${diff.join(', ')}`;
+                break;
+        }
+        res.innerHTML = output;
+    }
+    loadTask(1);
+</script>
+</body>
+</html>

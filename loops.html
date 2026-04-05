@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Projects - Loops Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --bg: #f5f3ff;
+            --sidebar-bg: #2e1065;
+            --sidebar-text: #f5f3ff;
+            --card-bg: #ffffff;
+            --text-main: #1e1b4b;
+            --text-muted: #6366f1;
+            --border: #ddd6fe;
+            --success: #10b981;
+            --error: #ef4444;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Reusing common styles with theme overrides */
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); display: flex; min-height: 100vh; }
+        .sidebar { width:280px; background-color:var(--sidebar-bg); color:var(--sidebar-text); display:flex; flex-direction:column; padding:1.5rem; position:fixed; height:100vh; overflow-y:auto; border-right:1px solid var(--border); }
+        .sidebar h2 { font-family:'Outfit', sans-serif; font-size:1.5rem; margin-bottom:2rem; color:#fff; display:flex; align-items:center; gap:10px; }
+        .sidebar h2::before { content: '🔄'; }
+        .nav-list { list-style:none; }
+        .nav-item { padding:0.75rem 1rem; margin-bottom:0.5rem; border-radius:8px; cursor:pointer; transition:all 0.2s; font-size:0.9rem; color:#ddd6fe; }
+        .nav-item:hover { background-color:rgba(255,255,255,0.1); color:#fff; }
+        .nav-item.active { background-color:var(--primary); color:#fff; font-weight:600; }
+        .main-content { flex:1; margin-left:280px; padding:3rem; display:flex; flex-direction:column; align-items:center; }
+        .container { max-width:800px; width:100%; }
+        .header { margin-bottom:2rem; width:100%; }
+        .header h1 { font-family:'Outfit', sans-serif; font-size:2.2rem; color:var(--text-main); }
+        .header p { color:var(--text-muted); margin-top:0.5rem; }
+        .card { background:var(--card-bg); padding:2.5rem; border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border); width:100%; transition:transform 0.3s ease; }
+        .input-group { margin-bottom:1.5rem; }
+        .input-group label { display:block; font-weight:600; margin-bottom:0.5rem; font-size:0.9rem; color:var(--text-main); }
+        .input-group input, .input-group select { width:100%; padding:12px 16px; border:1px solid var(--border); border-radius:8px; font-size:1rem; background:#f5f3ff; transition:border-color 0.2s; }
+        .input-group input:focus { outline:none; border-color:var(--primary); background:#fff; }
+        .btn { background:var(--primary); color:#fff; border:none; padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; width:100%; transition:background 0.2s; font-size:1rem; }
+        .btn:hover { background:var(--primary-hover); }
+        .result { margin-top:2rem; padding:1.5rem; border-radius:12px; background:#f5f3ff; min-height:80px; display:flex; align-items:center; justify-content:center; font-weight:500; text-align:left; border-left:4px solid var(--primary); }
+        .result-text { font-size:1rem; line-height:1.6; font-family:'Courier New', monospace; white-space: pre-wrap; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s ease forwards; }
+
+        @media (max-width: 768px) {
+            .sidebar { width:0; padding:0; display:none; }
+            .main-content { margin-left:0; padding:1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <h2>Loops Projects</h2>
+    <ul class="nav-list" id="nav-list"></ul>
+</aside>
+
+<main class="main-content">
+    <div class="container animate-fade" id="app-container">
+        <div class="header">
+            <h1 id="task-title">Select a Task</h1>
+            <p id="task-desc">Choose a loop exercise from the sidebar.</p>
+        </div>
+        <div class="card" id="task-card">
+            <div id="input-container"></div>
+            <button class="btn" onclick="executeCurrentTask()" id="run-btn">Run Iteration</button>
+            <div class="result">
+                <div class="result-text" id="result-display">Logs and outputs will appear here...</div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const tasks = [
+        { id: 1, title: "Multiplication Table", desc: "Generate a table for a number (1-10).", inputs: [{ label: "Number", type: "number", id: "num1" }] },
+        { id: 2, title: "Sum of first N", desc: "Sum numbers from 1 to N.", inputs: [{ label: "Value of N", type: "number", id: "num1" }] },
+        { id: 3, title: "Factorial", desc: "Calculate N! using a loop.", inputs: [{ label: "Number", type: "number", id: "num1" }] },
+        { id: 4, title: "Fibonacci Series", desc: "Generate first N terms.", inputs: [{ label: "Terms Count", type: "number", id: "num1" }] },
+        { id: 5, title: "Reverse a Number", desc: "Reverse digits (e.g. 123 -> 321).", inputs: [{ label: "Number", type: "number", id: "num1" }] },
+        { id: 6, title: "Count Digits", desc: "Count how many digits are in the number.", inputs: [{ label: "Number", type: "number", id: "num1" }] },
+        { id: 7, title: "Palindrome Checker", desc: "Check if number/string reads the same reverse.", inputs: [{ label: "Input", type: "text", id: "str1" }] },
+        { id: 8, title: "Prime Checker", desc: "Check if a number is prime.", inputs: [{ label: "Number", type: "number", id: "num1" }] },
+        { id: 9, title: "Armstrong Number", desc: "Sum of digits raised to power of count equals number.", inputs: [{ label: "Number", type: "number", id: "num1" }] },
+        { id: 10, title: "Guess the Number", desc: "Simple turn-based guess (Target: 7).", inputs: [{ label: "Your Guess (1-10)", type: "number", id: "num1" }] },
+        { id: 11, title: "Pattern: Stars", desc: "Right angled triangle.", inputs: [{ label: "Rows", type: "number", id: "num1" }] },
+        { id: 12, title: "Number Pyramid", desc: "Symmetric number pyramid.", inputs: [{ label: "Height", type: "number", id: "num1" }] },
+        { id: 13, title: "Login Retry (3 attempts)", desc: "Simulate failure until success or limit.", inputs: [{ label: "Password (hint: 'pass123')", type: "text", id: "pass" }] },
+        { id: 14, title: "Sum of Evens", desc: "Sum all even numbers up to N.", inputs: [{ label: "Limit", type: "number", id: "num1" }] },
+        { id: 15, title: "Count Vowels", desc: "Loop through string and count AEIOU.", inputs: [{ label: "Text", type: "text", id: "str1" }] },
+        { id: 16, title: "Find Largest in List", desc: "Loop through comma-separated numbers.", inputs: [{ label: "Numbers (e.g. 10,20,5,30)", type: "text", id: "list1" }] },
+        { id: 17, title: "Menu Calculator", desc: "Repeated calc until exit picked.", inputs: [{ label: "Choice (1:Add, 2:Exit)", type: "number", id: "c" }, { label: "A", type: "number", id: "a" }, { label: "B", type: "number", id: "b" }] },
+        { id: 18, title: "Password Retry System", desc: "Loop while invalid.", inputs: [{ label: "New Password (length > 5)", type: "text", id: "p1" }] },
+        { id: 19, title: "Common Elements", desc: "Find intersection of two comma-lists.", inputs: [{ label: "List 1", type: "text", id: "l1" }, { label: "List 2", type: "text", id: "l2" }] },
+        { id: 20, title: "Multiplication Quiz", desc: "Answer 5x7.", inputs: [{ label: "5 * 7 = ?", type: "number", id: "ans" }] }
+    ];
+
+    let currentTaskId = 1;
+    let loginAttempts = 0;
+
+    const navList = document.getElementById('nav-list');
+    tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = `nav-item ${task.id === 1 ? 'active' : ''}`;
+        li.textContent = task.title;
+        li.onclick = () => loadTask(task.id);
+        navList.appendChild(li);
+    });
+
+    function loadTask(id) {
+        currentTaskId = id;
+        const task = tasks.find(t => t.id === id);
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        const activeNav = Array.from(navList.children).find(li => li.textContent === task.title);
+        activeNav.classList.add('active');
+        document.getElementById('task-title').textContent = task.title;
+        document.getElementById('task-desc').textContent = task.desc;
+        const container = document.getElementById('input-container');
+        container.innerHTML = '';
+        task.inputs.forEach(inp => {
+            const group = document.createElement('div');
+            group.className = 'input-group';
+            group.innerHTML = `<label for="${inp.id}">${inp.label}</label><input type="${inp.type}" id="${inp.id}">`;
+            container.appendChild(group);
+        });
+        document.getElementById('result-display').textContent = 'Logs and outputs will appear here...';
+    }
+
+    function executeCurrentTask() {
+        const res = document.getElementById('result-display');
+        const vals = {};
+        tasks.find(t => t.id === currentTaskId).inputs.forEach(inp => {
+            vals[inp.id] = document.getElementById(inp.id).value;
+        });
+
+        let output = "";
+        switch(currentTaskId) {
+            case 1:
+                let n1 = Number(vals.num1);
+                for(let i=1; i<=10; i++) output += `${n1} x ${i} = ${n1 * i}\n`;
+                break;
+            case 2:
+                let limit2 = Number(vals.num1), sum2 = 0;
+                for(let i=1; i<=limit2; i++) sum2 += i;
+                output = `Sum of first ${limit2} numbers is: ${sum2}`;
+                break;
+            case 3:
+                let n3 = Number(vals.num1), fact = 1;
+                for(let i=1; i<=n3; i++) fact *= i;
+                output = `Factorial of ${n3} is: ${fact}`;
+                break;
+            case 4:
+                let len4 = Number(vals.num1), fib = [0, 1];
+                for(let i=2; i<len4; i++) fib.push(fib[i-1] + fib[i-2]);
+                output = `Fibonacci (${len4}): ${fib.slice(0, len4).join(', ')}`;
+                break;
+            case 5:
+                output = `Reversed: ${vals.num1.split('').reverse().join('')}`;
+                break;
+            case 6:
+                output = `Digit count: ${vals.num1.length}`;
+                break;
+            case 7:
+                let s7 = vals.str1.toLowerCase();
+                let rev7 = s7.split('').reverse().join('');
+                output = s7 === rev7 ? `"${s7}" is a Palindrome.` : `"${s7}" is NOT a Palindrome.`;
+                break;
+            case 8:
+                let p8 = Number(vals.num1), isPrime = p8 > 1;
+                for(let i=2; i<=Math.sqrt(p8); i++) if(p8 % i === 0) isPrime = false;
+                output = isPrime ? `${p8} is a Prime Number.` : `${p8} is NOT Prime.`;
+                break;
+            case 9:
+                let n9 = vals.num1, power9 = n9.length, sum9 = 0;
+                for(let d of n9) sum9 += Math.pow(parseInt(d), power9);
+                output = sum9 == n9 ? `${n9} is an Armstrong Number.` : `${n9} is NOT Armstrong.`;
+                break;
+            case 10:
+                output = parseInt(vals.num1) === 7 ? "Correct! You guessed 7." : "Try again!";
+                break;
+            case 11:
+                let r11 = Number(vals.num1);
+                for(let i=1; i<=r11; i++) output += "* ".repeat(i) + "\n";
+                break;
+            case 12:
+                let h12 = Number(vals.num1);
+                for(let i=1; i<=h12; i++) {
+                    output += " ".repeat(h12 - i) + (i + " ").repeat(i) + "\n";
+                }
+                break;
+            case 13:
+                if(vals.pass === 'pass123') { output = "Login Success!"; loginAttempts = 0; }
+                else { loginAttempts++; output = `Failed! (${3-loginAttempts} left)`; if(loginAttempts >= 3) output = "Account Locked."; }
+                break;
+            case 14:
+                let l14 = Number(vals.num1), s14 = 0;
+                for(let i=1; i<=l14; i++) if(i%2===0) s14+=i;
+                output = `Sum of evens up to ${l14}: ${s14}`;
+                break;
+            case 15:
+                let v15 = 0;
+                for(let c of vals.str1.toLowerCase()) if('aeiou'.includes(c)) v15++;
+                output = `Vowel count: ${v15}`;
+                break;
+            case 16:
+                let arr16 = vals.list1.split(',').map(Number);
+                let max16 = arr16[0];
+                for(let x of arr16) if(x > max16) max16 = x;
+                output = `Largest in list: ${max16}`;
+                break;
+            case 17:
+                if(vals.c == 1) output = `Result (Add): ${Number(vals.a) + Number(vals.b)}`;
+                else output = "Exiting menu system.";
+                break;
+            case 18:
+                output = vals.p1.length > 5 ? "Password set successfully." : "Password too short! (While loop simulation: Please re-enter)";
+                break;
+            case 19:
+                let a19 = vals.l1.split(','), b19 = vals.l2.split(',');
+                let com = a19.filter(x => b19.includes(x));
+                output = `Common elements: ${com.join(', ')}`;
+                break;
+            case 20:
+                output = parseInt(vals.ans) === 35 ? "Correct! 5x7=35." : "Wrong answer.";
+                break;
+        }
+        res.innerHTML = output;
+    }
+    loadTask(1);
+</script>
+</body>
+</html>
