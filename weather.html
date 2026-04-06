@@ -1,60 +1,325 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Weather App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Weather Dashboard</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.7); /* More opaque for dark text */
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --accent: #e67e22; /* Slightly more vibrant orange for contrast */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            /* Fallback to CSS gradient if image fails */
+            background-image: url('weather_bg.png');
+            background-size: cover;
+            background-position: center;
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            margin: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #1a1a1a, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        input {
+            flex: 1;
+            padding: 18px 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.5);
+            color: #1a1a1a;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.1);
+        }
+
+        input::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        button {
+            padding: 15px 25px;
+            border-radius: 20px;
+            border: none;
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 174, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .weather-info {
+            text-align: center;
+            display: none;
+        }
+
+        .weather-info.active {
+            display: block;
+            animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .city-name {
+            font-size: 1.6rem;
+            font-weight: 400;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .temp {
+            font-size: 5rem;
+            font-weight: 800;
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            line-height: 1;
+        }
+
+        .temp span {
+            font-size: 2rem;
+            margin-top: 10px;
+            font-weight: 300;
+            margin-left: 5px;
+        }
+
+        .condition-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+        }
+
+        .condition-text {
+            font-size: 1.4rem;
+            text-transform: capitalize;
+            margin-bottom: 35px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding-top: 30px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .detail-item {
+            background: rgba(0, 0, 0, 0.03);
+            padding: 20px;
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .detail-item:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .loading, .error {
+            text-align: center;
+            padding: 30px;
+            border-radius: 20px;
+            display: none;
+        }
+
+        .error { 
+            color: #ff8c8c; 
+            background: rgba(255, 0, 0, 0.05);
+            border: 1px solid rgba(255, 0, 0, 0.1);
+        }
+        
+        #loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0,0,0,0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            animation: spin 1s infinite cubic-bezier(0.5, 0.1, 0.4, 0.9);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+    </style>
 </head>
 <body>
- 
-    <h2>Simple Weather App</h2>
- 
-    <input type="text" id="city" placeholder="Enter city name">
-    <button onclick="getWeather()">Get Weather</button>
- 
-    <h3 id="result"></h3>
- 
+
+    <div class="container">
+        <h1>Weather.io</h1>
+
+        <div class="search-box">
+            <input type="text" id="city-input" placeholder="Enter city name..." autocomplete="off">
+            <button onclick="getWeather()">Search</button>
+        </div>
+
+        <div id="loading" class="loading">
+            <div id="loading-spinner"></div>
+            <p>Scanning the atmosphere...</p>
+        </div>
+
+        <div id="error" class="error"></div>
+
+        <div id="weather-display" class="weather-info">
+            <div class="city-name" id="city-name">--</div>
+            <img id="condition-icon" src="" alt="Weather" class="condition-icon">
+            <div class="temp" id="temperature">--<span>°C</span></div>
+            <div class="condition-text" id="condition-text">--</div>
+            
+            <div class="details">
+                <div class="detail-item">
+                    <div class="detail-label">Humidity</div>
+                    <div class="detail-value" id="humidity">--</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Wind Speed</div>
+                    <div class="detail-value" id="wind">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-    const apiKey = "47080d045ee64353812103027262503";
+        const apiKey = "47080d045ee64353812103027262503";
+        const input = document.getElementById("city-input");
 
-    async function getWeather() {
-        const city = document.getElementById("city").value.trim();
-        const result = document.getElementById("result");
+        // Search on Enter
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") getWeather();
+        });
 
-        if (!city) {
-            result.innerText = "Please enter a city name.";
-            return;
-        }
+        async function getWeather() {
+            const city = input.value.trim();
+            const display = document.getElementById("weather-display");
+            const loading = document.getElementById("loading");
+            const errorDiv = document.getElementById("error");
 
-        // 1. Show loading state
-        result.innerText = "Searching...";
+            if (!city) return;
 
-        try {
-            const response = await fetch(
-                `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`
-            );
+            // Reset UI
+            display.classList.remove("active");
+            errorDiv.style.display = "none";
+            loading.style.display = "block";
 
-            // 2. Check for HTTP errors (like 404 or 401)
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error.message || "City not found");
+            try {
+                const response = await fetch(
+                    `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`
+                );
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error.message || "City not found");
+                }
+
+                const data = await response.json();
+                
+                // Update elements
+                document.getElementById("city-name").textContent = `${data.location.name}, ${data.location.country}`;
+                document.getElementById("temperature").innerHTML = `${Math.round(data.current.temp_c)}<span>°C</span>`;
+                document.getElementById("condition-text").textContent = data.current.condition.text;
+                document.getElementById("condition-icon").src = "https:" + data.current.condition.icon;
+                document.getElementById("humidity").textContent = `${data.current.humidity}%`;
+                document.getElementById("wind").textContent = `${data.current.wind_kph} kph`;
+
+                // Show data
+                loading.style.display = "none";
+                display.classList.add("active");
+
+            } catch (err) {
+                loading.style.display = "none";
+                errorDiv.innerText = "Oops! " + err.message;
+                errorDiv.style.display = "block";
             }
-
-            const data = await response.json();
-
-            // 3. Display with better formatting
-            result.style.whiteSpace = "pre-line"; // Respects new lines
-            result.innerText = `
-                City: ${data.location.name}, ${data.location.country}
-                Temperature: ${data.current.temp_c}°C
-                Condition: ${data.current.condition.text}
-                Humidity: ${data.current.humidity}%
-                Wind: ${data.current.wind_kph} kph
-            `;
-        } catch (error) {
-            // 4. Catch both network and API errors
-            result.innerText = "Error: " + error.message;
         }
-    }
-</script>
- 
+    </script>
 </body>
 </html>
